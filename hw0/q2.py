@@ -11,7 +11,7 @@ img = Image.open(ipt_file)
 enhancer = ImageEnhance.Brightness(img)
 imgw = enhancer.enhance(0.5)
 #pix2  = list(imgw.getdata())
-imgw.save("Q2.jpg","JPEG")
+imgw.save("Q2.png","PNG")
 
 #for i in range(10):
 #	print(pix1[i],pix2[i])
