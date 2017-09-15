@@ -18,12 +18,17 @@ my_dict = {i:raw_Words.count(i) for i in raw_Words}
 Keys = list(my_dict.keys())
 #print(Keys)
 #exit(1)
+
 key_p = [ raw_Words.index(key) for key in Keys ] 
 mp = sorted(range(len(key_p)), key=lambda k: key_p[k])
 
 f = open("Q1.txt",'w')
 for i in range(len(mp)) :
 	#print(Keys[mp[i]])
-	f.write("%s %d %d\n"%(Keys[mp[i]],i,my_dict[Keys[mp[i]]]))
+	if i == len(mp) - 1:
+		f.write("%s %d %d"%(Keys[mp[i]],i,my_dict[Keys[mp[i]]]))
+	else:
+		f.write("%s %d %d\n"%(Keys[mp[i]],i,my_dict[Keys[mp[i]]]))
+	
 	#print("%s %d %d\n",key,my_dict[key],
 f.close()
