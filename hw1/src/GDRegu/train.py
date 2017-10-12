@@ -1,9 +1,8 @@
 import numpy as np 
 #import scipy as sp
 import pandas as pd
-import os,sys,time
+import os,sys
 from utils import *
-np.random.seed(int(time.time()))
 # simple linear regration using simple GD
 
 if len(sys.argv) < 2 :
@@ -14,8 +13,11 @@ is_ReadWb = False
 if len(sys.argv) > 2:
 	is_ReadWb = int(sys.argv[2])
 
+#lmbd = 0.01
+#if len(sys.argv) > 3:
+#	lmbd = float(sys.argv[3])	
 
-ID, feature , Order ,N_iter,learn_rate,BatchSz, train_pth , _ = ReadConf(CfgPath)
+ID, feature , Order ,N_iter , learn_rate,lmbd, train_pth , _ = ReadConf(CfgPath)
 
 #learn_rate = 0.001
 ModelPath = os.path.join("model",ID)
@@ -49,10 +51,10 @@ mean_ij = [ [ np.mean(train_x[:,i,j]) for j in range(Hour_N) ] for i in range(Ty
 SFactor = np.array(std_ij)**-1
 Offset  = np.array(mean_ij)
 train_x = SFactor * (train_x - Offset)
+
 trn_X = []
 for o in range(Order):
 	trn_X.append(train_x**(o+1))
-
 
 # Init weight
 Model_W = []
@@ -77,32 +79,32 @@ else :
 
 
 
-## sGD 
-for itr in range(N_iter):
-
-	smp_idx = np.random.randint(len(train_x),size=BatchSz)
-
-	tmp = Model_W[0] * trn_X[0][smp_idx]
-	for o in range(Order-1):
-		tmp += Model_W[o+1] * trn_X[o+1][smp_idx]
+## GD 
  
+for itr in range(N_iter):
+	tmp = Model_W[0] * trn_X[0] 
+	regu = np.sum(lmbd*Model_W[0]**2)
+	for o in range(Order-1):
+		tmp += Model_W[o+1] * trn_X[o+1]
+		regu += np.sum(lmbd*Model_W[o+1]**2)
+	#regu /= Order 
 	new_y = np.sum( tmp , axis =(1,2)) + b  
-	diff_y = train_y[smp_idx] - new_y
+	diff_y = train_y - new_y
 	D_yOp = diff_y[:,np.newaxis,np.newaxis]
 	
 	#print (np.shape(d_y))
-	Loss_reduce = np.mean ( ( diff_y )**2 )
+	Loss_reduce = np.mean ( ( diff_y )**2)  + regu/len(diff_y)
 	
 	for o in range(Order):
-		grad_W = np.mean(-2*D_yOp*trn_X[o][smp_idx],axis=0)
-		Model_W[o] = Model_W[o] - learn_rate * grad_W
+		grad_W = np.mean(-2*D_yOp*trn_X[o],axis=0)
+		Model_W[o] = Model_W[o] - learn_rate * (grad_W + 2*lmbd * Model_W[o])
 
 	grad_b = np.mean(-2*diff_y)
 	b = b - learn_rate * grad_b	
 	
 	
 
-	if itr%1000 == 0 :
+	if itr%100== 0 :
 		print (Loss_reduce)
 
 
@@ -121,6 +123,7 @@ np.save(os.path.join(ModelPath,"SF"),SFactor)
 
 print ("Save Offset Array.")
 np.save(os.path.join(ModelPath,"OF"),Offset)
+
 
 
 

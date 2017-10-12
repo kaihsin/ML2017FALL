@@ -12,7 +12,7 @@ def ReadConf(cfgfpath):
 	Order = 1
 	N_iter = 1
 	learn_rate = 0.001
-	BatchSz = 1
+	Lmbd = 0
 	ID = None
 	f = open(cfgfpath,'r')
 	lines  = f.readlines()
@@ -51,16 +51,16 @@ def ReadConf(cfgfpath):
 			line = line.split('\n')[0]
 			line = line.strip()
 			learn_rate = float(line)
-		elif 'BatchSz' in line:
+		elif 'Lmbd' in line:
 			line = line.split('=')[-1]
 			line = line.split('\n')[0]
 			line = line.strip()
-			BatchSz = int(line)
+			Lmbd = float(line)
 	f.close()
 	if ID is None:
 		print ("ERROR, ID not set in conf.")
 		exit(1)
-	return ID, feature, Order, N_iter,learn_rate,BatchSz, train_pth, test_pth
+	return ID, feature, Order, N_iter,learn_rate,Lmbd, train_pth, test_pth
 
 
 def ReadData(fpath,skiprow,skipcol):
