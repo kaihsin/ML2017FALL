@@ -1,0 +1,7 @@
+ID = SLGDo4
+learn_rate = 0.00001
+epoch = 0
+cut_rate = 0.8
+regu_rate = 0.0
+order = 4
+

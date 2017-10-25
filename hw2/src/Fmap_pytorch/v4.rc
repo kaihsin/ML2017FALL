@@ -1,0 +1,6 @@
+ID = srcv2-v4
+learn_rate = 0.5
+epoch = 5
+#regu_rate = 0
+dropout = 0.6
+batchsz = 256
