@@ -1,5 +1,5 @@
 import os,sys,time
-sys.path.append("../")
+#sys.path.append("../")
 from myutils.data_reader import *
 from myutils.neuron import *
 from myutils.variable import *

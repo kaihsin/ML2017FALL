@@ -1,5 +1,5 @@
 import os,sys
-import torch
+import torch 
 import torch.utils.data as torutils
 from torch.autograd import Variable
 from myutils.data_reader import *
@@ -10,7 +10,7 @@ def sigmoid(z):
 
 def manipX(ipt):
     ## manipulate the data-set here to the data in dstream
-    ## ipt : ndarray
+    ## ipt : ndarray 
     ipt = ipt.astype(np.float)
     ipt = np.delete(ipt,1,1)
     #print (ipt)
@@ -42,7 +42,7 @@ if not os.path.exists(model_dir):
 	os.system("mkdir %s"%(model_dir))
 
 
-## layout :
+## layout : 
 pars.print_vals()
 
 
@@ -53,7 +53,7 @@ Xreader.Read_csv(Xpath,"big5",manipX)
 Yreader = Data_reader()
 Yreader.Read_csv(Ypath,"big5",manipY)
 
-NFeature = len(Xreader.data[0])
+NFeature = len(Xreader.data[0]) 
 NSample  = len(Xreader.data)
 NTrain   = int(NSample*0.8)
 
@@ -100,41 +100,35 @@ valid_loader = torutils.DataLoader(torutils.TensorDataset(valid_x,valid_y),batch
 #------------------------------------------------------------------
 ## create model :
 ClassifyNet = None
-ClassifyNet = torch.nn.Sequential(\
-				torch.nn.Linear(NFeature, NFeature),\
-                torch.nn.Dropout(drop_out),\
-                torch.nn.Softplus(),\
-				torch.nn.Linear(NFeature, NFeature),\
-                torch.nn.Dropout(drop_out),\
-                torch.nn.ReLU(),\
-				torch.nn.Linear(NFeature, NFeature),\
-                torch.nn.Dropout(drop_out),\
-                torch.nn.ReLU(),\
-                torch.nn.Linear(NFeature, 1),\
-                #torch.nn.Dropout(0.5),\
-                torch.nn.Sigmoid()\
-             ).double()
-
-
 if is_res:
-	ClassifyNet.load_state_dict(torch.load(os.path.join(model_dir,"model")))
+	ClassifyNet = torch.load(os.path.join(model_dir,"model"))
 	print ("[load] Net(model)")
+else:
+	ClassifyNet = torch.nn.Sequential(\
+					torch.nn.Linear(NFeature, NFeature),\
+					torch.nn.Dropout(drop_out),\
+					torch.nn.ReLU(),\
+    				torch.nn.Linear(NFeature, 1),\
+					#torch.nn.Dropout(0.5),\
+					torch.nn.Sigmoid()
+				  ).double()
 
 optimizer = torch.optim.SGD(ClassifyNet.parameters(), lr=learn_rate)
 loss_fx   = torch.nn.BCELoss()
 
 print ("Start")
 sys.stdout.flush()
+ClassifyNet.train()
 for en in range(Nepoch):
 	error=0
 	for ns , (tr_x,tr_y) in enumerate(train_loader):
-		pred = ClassifyNet(Variable(tr_x))
+		pred = ClassifyNet(Variable(tr_x))	
 		#exit(1)
 		error += np.sum(np.abs(np.round(pred.data.numpy().flatten()) - tr_y.numpy().flatten()))
 		#exit(1)
 		loss = loss_fx(pred.squeeze(),Variable(tr_y))
 		#exit(1)
-		ClassifyNet.zero_grad()
+		ClassifyNet.zero_grad()		
 		loss.backward()
 		optimizer.step()
 
@@ -144,10 +138,11 @@ for en in range(Nepoch):
 	sys.stdout.flush()
 
 ## Save:
-torch.save(ClassifyNet.state_dict(),os.path.join(model_dir,"model"))
+torch.save(ClassifyNet,os.path.join(model_dir,"model"))
 
-## Validate
+## Validate 
 accuracy = []
+ClassifyNet.eval()
 for n , (va_x,va_y) in enumerate(valid_loader):
 	#print ("va",n)
 	pred = ClassifyNet(Variable(va_x))
@@ -157,3 +152,4 @@ for n , (va_x,va_y) in enumerate(valid_loader):
 
 print (accuracy)
 sys.stdout.flush()
+
