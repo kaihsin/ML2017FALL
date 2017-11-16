@@ -1,0 +1,7 @@
+# model property
+ID = v8_1
+train_rate = 0.9
+learn_rate = 0.001
+epoch      = 20
+batch_sz   = 128
+
