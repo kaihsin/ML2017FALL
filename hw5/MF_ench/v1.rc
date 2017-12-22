@@ -1,0 +1,7 @@
+ID = test
+batch_sz = 512
+epoch = 10
+embed_dim = 128
+learn_rate = 0.005
+train_rate = 0.9
+regu = 0.0000001
