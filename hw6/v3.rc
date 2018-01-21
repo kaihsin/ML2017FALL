@@ -1,0 +1,7 @@
+ID = v3_HEL
+learn_rate = 0.0002
+valid_rate = 0.01
+regu       = 1.0e-10
+epoch      = 10
+batch_sz   = 256
+Fdim       = 4
